@@ -4,6 +4,7 @@ import (
 	sql "database/sql"
 	"encoding/json"
 	"net/http"
+	"fmt" 
 )
 
 type Service struct {
@@ -46,8 +47,15 @@ func (s *Service) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("product created"))
 }
 
-func (s *Service) GetProducts(w http.ResponseWriter, r *http.Request) {
+func (s *Service) GetProduct(w http.ResponseWriter, r *http.Request) {
+	
+}
 
+func (s *Service) ListProduct(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("List Product Handler!")
+	var dbName string
+	s.db.QueryRow("SELECT current_database()").Scan(&dbName)
+	fmt.Printf(dbName)
 
 
 }

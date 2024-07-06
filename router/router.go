@@ -6,7 +6,7 @@ import (
 	s "restAPI/services"
 	"context"
 	"strings"
-	"fmt"
+
 )
 
 
@@ -22,8 +22,8 @@ func NewRouter(db *sql.DB) *Router {
 	service := s.NewService(db)
 
     router.addRoute("POST", "/products", service.CreateProduct)
-    router.addRoute("GET", "/products", service.GetProducts)
-	router.addRoute("GET", "/products/{id}", service.GetProducts)
+    router.addRoute("GET", "/products", service.ListProduct)
+	router.addRoute("GET", "/products/{id}", service.GetProduct)
 
     return router
 }
@@ -45,7 +45,6 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			ctx := req.Context()
 			for k, v := range params {
 				ctx = context.WithValue(ctx, k, v)
-				fmt.Printf("ctx %v\n", ctx)	
 			}
 			handler.ServeHTTP(w, req.WithContext(ctx))
 			return
@@ -55,22 +54,21 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 func matchRoute(route, path string) (bool, map[string]string) {
-	routeParts := strings.Split(route, "/")
-	pathParts := strings.Split(path, "/")
+	route_mtx := strings.Split(route, "/")
+	path_mtx := strings.Split(path, "/")
 
-	if len(routeParts) != len(pathParts) {
+	if len(route_mtx) != len(path_mtx) {
 		return false, nil
 	}
 
 	params := make(map[string]string)
-	for i := range routeParts {
-		if strings.HasPrefix(routeParts[i], "{") && strings.HasSuffix(routeParts[i], "}") {
-			paramName := routeParts[i][1 : len(routeParts[i])-1]
-			params[paramName] = pathParts[i]
-		} else if routeParts[i] != pathParts[i] {
+	for i := range route_mtx {
+		if strings.HasPrefix(route_mtx[i], "{") && strings.HasSuffix(route_mtx[i], "}") {
+			paramName := route_mtx[i][1 : len(route_mtx[i])-1]
+			params[paramName] = path_mtx[i]
+		} else if route_mtx[i] != path_mtx[i] {
 			return false, nil
 		}
 	}
-	fmt.Printf("params : %v\n", params)
 	return true, params
 }

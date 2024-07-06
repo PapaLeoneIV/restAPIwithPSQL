@@ -10,7 +10,7 @@ import(
 
 func main(){
 	
-	db := db.NewDB("postgres", "user=postgres dbname=album_db password= sslmode=disable")
+	db := db.NewDB("postgres", "user=postgres dbname=album_db sslmode=disable")
 
 	router := router.NewRouter(db)
 
