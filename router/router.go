@@ -6,6 +6,7 @@ import (
 	s "restAPI/services"
 	"context"
 	"strings"
+	"fmt"
 
 )
 
@@ -21,9 +22,12 @@ func NewRouter(db *sql.DB) *Router {
 
 	service := s.NewService(db)
 
-    router.addRoute("POST", "/products", service.CreateProduct)
-    router.addRoute("GET", "/products", service.ListProduct)
+    router.addRoute("GET", "/products", service.ListAllProducts)
 	router.addRoute("GET", "/products/{id}", service.GetProduct)
+    router.addRoute("POST", "/products", service.CreateProduct)
+	router.addRoute("PUT", "/updateproduct", service.UpdateProduct)
+	router.addRoute("DELETE", "/delete_products/{id}", service.DeleteProduct)
+
 
     return router
 }
@@ -34,6 +38,7 @@ func (r *Router) addRoute(method string, path string, handler http.HandlerFunc) 
 		r.routes[method] = make(map[string]http.HandlerFunc)
 	}
 	r.routes[method][path] = handler
+	fmt.Printf("New route added to the router through service struct!\n")
 }
 
 func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {

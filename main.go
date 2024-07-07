@@ -10,7 +10,7 @@ import(
 
 func main(){
 	
-	db := db.NewDB("postgres", "user=postgres dbname=album_db sslmode=disable")
+	db := db.NewDB("postgres", "host=localhost user=postgres password=ric dbname=album_db sslmode=disable")
 
 	router := router.NewRouter(db)
 
@@ -19,7 +19,7 @@ func main(){
 		Handler: router,
 	}
 
-	fmt.Printf("Listening on port: 8080")
+	fmt.Printf("Listening on port: 8080\n")
 	if err := s.ListenAndServe(); err != nil {
 		panic(err)
 	}
