@@ -5,12 +5,18 @@ import(
 	"fmt"
 	"restAPI/db"
 	"restAPI/router"
+	"restAPI/env"
 )
 
 
 func main(){
-	
-	db := db.NewDB("postgres", "host=localhost user=postgres password=ric dbname=album_db sslmode=disable")
+
+
+	envManager := env.SetupEnv("env/.env")
+	strin := fmt.Sprintf("%s, %s", envManager.DbSource, envManager.DbDriver)
+
+	fmt.Printf("DB Source: %s\n", strin)
+	db := db.NewDB(envManager.DbDriver, envManager.DbSource)
 
 	router := router.NewRouter(db)
 

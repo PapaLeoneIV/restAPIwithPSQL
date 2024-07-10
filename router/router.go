@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"database/sql"
 	s "restAPI/services"
+	"restAPI/limit"
 	"context"
 	"strings"
 	"fmt"
@@ -22,12 +23,16 @@ func NewRouter(db *sql.DB) *Router {
 
 	service := s.NewService(db)
 
-    router.addRoute("GET", "/products", service.ListAllProducts)
-	router.addRoute("GET", "/products/{id}", service.GetProduct)
-    router.addRoute("POST", "/products", service.CreateProduct)
-	router.addRoute("PUT", "/updateproduct", service.UpdateProduct)
-	router.addRoute("DELETE", "/delete_products/{id}", service.DeleteProduct)
-
+	router.addRoute("GET",
+		"/products", limit.RateLimiter((service.ListAllProducts)).(http.HandlerFunc))
+	router.addRoute("GET",
+		"/products/{id}", limit.RateLimiter((service.GetProduct)).(http.HandlerFunc))
+    router.addRoute("POST",
+		"/products", limit.RateLimiter((service.CreateProduct)).(http.HandlerFunc))
+	router.addRoute("PUT",
+		"/updateproduct", limit.RateLimiter((service.UpdateProduct)).(http.HandlerFunc))
+	router.addRoute("DELETE",
+		"/delete_products/{id}", limit.RateLimiter((service.DeleteProduct)).(http.HandlerFunc))
 
     return router
 }

@@ -5,7 +5,10 @@ import (
 	_ "github.com/lib/pq"
 	"fmt"
 	"log"
-)
+) 
+
+
+
 func NewDB(dbDriver string, dbSource string) *sql.DB {
 	fmt.Printf("Opening the database\n")
 	db, err := sql.Open(dbDriver, dbSource)
@@ -23,4 +26,4 @@ func NewDB(dbDriver string, dbSource string) *sql.DB {
 	fmt.Printf("Database Connected\n")
 
 	return db
-}
+} 
