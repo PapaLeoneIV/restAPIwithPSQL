@@ -1,33 +1,42 @@
 package main
 
-import(
-	"net/http"
+import (
 	"fmt"
-	"restAPI/db"
+	"net/http"
+	"crypto/tls"
+	tls_ "restAPI/tls"
 	"restAPI/router"
+	"restAPI/db"
 	"restAPI/env"
 )
 
-
-func main(){
-
-
+func main() {
+	fmt.Println("Setting up environment variables from env/.env")
 	envManager := env.SetupEnv("env/.env")
-	strin := fmt.Sprintf("%s, %s", envManager.DbSource, envManager.DbDriver)
+	fmt.Printf("Environment setup complete: %+v\n", envManager)
 
-	fmt.Printf("DB Source: %s\n", strin)
+	fmt.Println("Initializing database connection")
 	db := db.NewDB(envManager.DbDriver, envManager.DbSource)
+	fmt.Println("Database connection initialized")
 
+	fmt.Println("Setting up TLS configuration")
+	config := tls_.NewConfig()
+	fmt.Println("TLS configuration set up")
+
+	fmt.Println("Setting up router")
 	router := router.NewRouter(db)
+	fmt.Println("Router setup complete")
 
+	fmt.Println("Creating and configuring the HTTP server")
 	s := &http.Server{
-		Addr: ":8080",
-		Handler: router,
+		Addr:         ":8443",
+		Handler:      router,
+		TLSConfig:    config,
+		TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler), 0),
 	}
 
-	fmt.Printf("Listening on port: 8080\n")
-	if err := s.ListenAndServe(); err != nil {
-		panic(err)
+	fmt.Printf("Listening on port: 8443\n")
+	if err := s.ListenAndServeTLS("tls/server.crt", "tls/server.key"); err != nil {
+		fmt.Printf("Error starting server: %s\n", err)
 	}
-
 }
